@@ -4,6 +4,10 @@ import { RouteResults } from "@/components/RouteResults";
 import { SafetyTips } from "@/components/SafetyTips";
 import { TaxiRankInfo } from "@/components/TaxiRankInfo";
 import { HandSignsGuide } from "@/components/HandSignsGuide";
+import { SpecialTransportBooking } from "@/components/SpecialTransportBooking";
+import { DriverJobs } from "@/components/DriverJobs";
+import { TaxiManagement } from "@/components/TaxiManagement";
+import { FinancialTracking } from "@/components/FinancialTracking";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -18,7 +22,11 @@ import {
   Download,
   MapIcon,
   Wifi,
-  WifiOff
+  WifiOff,
+  Calendar,
+  Briefcase,
+  Car,
+  TrendingUp
 } from "lucide-react";
 
 interface AppState {
@@ -32,6 +40,7 @@ interface AppState {
   activeTab: string;
   currentLocation: string;
   timeOfDay: 'morning' | 'afternoon' | 'evening' | 'night';
+  userType: 'commuter' | 'driver' | 'owner';
 }
 
 const Index = () => {
@@ -41,7 +50,8 @@ const Index = () => {
     searchResults: null,
     activeTab: 'trip-planner',
     currentLocation: 'Johannesburg CBD',
-    timeOfDay: 'afternoon'
+    timeOfDay: 'afternoon',
+    userType: 'commuter'
   });
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -188,19 +198,100 @@ const Index = () => {
                   </div>
                 </Card>
 
-                <Card className="p-4 border-2 border-primary/20 hover:border-primary/40 transition-smooth">
+                <Card className="p-4 border-2 border-primary/20 hover:border-primary/40 transition-smooth cursor-pointer"
+                      onClick={() => setAppState(prev => ({ ...prev, activeTab: 'special-transport' }))}>
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-muted rounded-lg">
-                      <Download className="h-6 w-6 text-muted-foreground" />
+                    <div className="p-2 bg-accent/10 rounded-lg">
+                      <Calendar className="h-6 w-6 text-accent" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">Offline Maps</h3>
-                      <p className="text-sm text-muted-foreground">Download for offline use</p>
+                      <h3 className="font-semibold">Book Special Transport</h3>
+                      <p className="text-sm text-muted-foreground">Airport, medical & event trips</p>
                     </div>
                   </div>
                 </Card>
               </div>
             </Card>
+
+            {/* User Type Selection */}
+            <Card className="p-6">
+              <h3 className="font-semibold mb-4">I am a...</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <Button 
+                  variant={appState.userType === 'commuter' ? 'default' : 'outline'}
+                  onClick={() => setAppState(prev => ({ ...prev, userType: 'commuter' }))}
+                  className="justify-start"
+                >
+                  <Route className="h-4 w-4 mr-2" />
+                  Commuter
+                </Button>
+                <Button 
+                  variant={appState.userType === 'driver' ? 'default' : 'outline'}
+                  onClick={() => setAppState(prev => ({ ...prev, userType: 'driver' }))}
+                  className="justify-start"
+                >
+                  <Briefcase className="h-4 w-4 mr-2" />
+                  Driver
+                </Button>
+                <Button 
+                  variant={appState.userType === 'owner' ? 'default' : 'outline'}
+                  onClick={() => setAppState(prev => ({ ...prev, userType: 'owner' }))}
+                  className="justify-start"
+                >
+                  <Car className="h-4 w-4 mr-2" />
+                  Owner/Operator
+                </Button>
+              </div>
+            </Card>
+
+            {/* Role-specific features */}
+            {appState.userType === 'driver' && (
+              <Card className="p-6 bg-gradient-sunset text-primary-foreground">
+                <h3 className="font-semibold mb-3">Driver Features</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <Button 
+                    variant="secondary" 
+                    className="bg-white/20 text-primary-foreground border-0 hover:bg-white/30"
+                    onClick={() => setAppState(prev => ({ ...prev, activeTab: 'driver-jobs' }))}
+                  >
+                    <Briefcase className="h-4 w-4 mr-2" />
+                    Find Jobs
+                  </Button>
+                  <Button 
+                    variant="secondary" 
+                    className="bg-white/20 text-primary-foreground border-0 hover:bg-white/30"
+                    onClick={() => setAppState(prev => ({ ...prev, activeTab: 'financial-tracking' }))}
+                  >
+                    <TrendingUp className="h-4 w-4 mr-2" />
+                    Track Earnings
+                  </Button>
+                </div>
+              </Card>
+            )}
+
+            {appState.userType === 'owner' && (
+              <Card className="p-6 bg-gradient-earth text-primary-foreground">
+                <h3 className="font-semibold mb-3">Owner Features</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <Button 
+                    variant="secondary" 
+                    className="bg-white/20 text-primary-foreground border-0 hover:bg-white/30"
+                    onClick={() => setAppState(prev => ({ ...prev, activeTab: 'taxi-management' }))}
+                  >
+                    <Car className="h-4 w-4 mr-2" />
+                    Manage Fleet
+                  </Button>
+                  <Button 
+                    variant="secondary" 
+                    className="bg-white/20 text-primary-foreground border-0 hover:bg-white/30"
+                    onClick={() => setAppState(prev => ({ ...prev, activeTab: 'financial-tracking' }))}
+                  >
+                    <TrendingUp className="h-4 w-4 mr-2" />
+                    Financial Reports
+                  </Button>
+                </div>
+              </Card>
+            )}
 
             {/* Quick offline status */}
             <Card className="p-4 bg-gradient-sunset text-primary-foreground">
@@ -252,46 +343,39 @@ const Index = () => {
           </div>
         )}
 
-        {/* Tabs for other features */}
-        {appState.activeTab !== 'trip-planner' && !appState.searchResults && (
-          <Tabs value={appState.activeTab} onValueChange={(value) => setAppState(prev => ({ ...prev, activeTab: value }))}>
-            <TabsList className="grid w-full grid-cols-4 mx-6 mb-6">
-              <TabsTrigger value="safety">
-                <Shield className="h-4 w-4 mr-1" />
-                Safety
-              </TabsTrigger>
-              <TabsTrigger value="ranks">
-                <MapPin className="h-4 w-4 mr-1" />
-                Ranks
-              </TabsTrigger>
-              <TabsTrigger value="hand-signs">
-                <Hand className="h-4 w-4 mr-1" />
-                Signs
-              </TabsTrigger>
-              <TabsTrigger value="trip-planner" onClick={() => setAppState(prev => ({ ...prev, searchResults: null }))}>
-                <Route className="h-4 w-4 mr-1" />
-                Plan
-              </TabsTrigger>
-            </TabsList>
+        {/* Feature Components */}
+        {appState.activeTab === 'safety' && (
+          <SafetyTips 
+            location={appState.currentLocation}
+            timeOfDay={appState.timeOfDay}
+          />
+        )}
 
-            <TabsContent value="safety">
-              <SafetyTips 
-                location={appState.currentLocation}
-                timeOfDay={appState.timeOfDay}
-              />
-            </TabsContent>
+        {appState.activeTab === 'ranks' && (
+          <TaxiRankInfo
+            ranks={[]}
+            onNavigateToRank={handleNavigateToRank}
+          />
+        )}
 
-            <TabsContent value="ranks">
-              <TaxiRankInfo
-                ranks={[]}
-                onNavigateToRank={handleNavigateToRank}
-              />
-            </TabsContent>
+        {appState.activeTab === 'hand-signs' && (
+          <HandSignsGuide />
+        )}
 
-            <TabsContent value="hand-signs">
-              <HandSignsGuide />
-            </TabsContent>
-          </Tabs>
+        {appState.activeTab === 'special-transport' && (
+          <SpecialTransportBooking />
+        )}
+
+        {appState.activeTab === 'driver-jobs' && (
+          <DriverJobs />
+        )}
+
+        {appState.activeTab === 'taxi-management' && (
+          <TaxiManagement />
+        )}
+
+        {appState.activeTab === 'financial-tracking' && (
+          <FinancialTracking />
         )}
       </div>
 
@@ -354,6 +438,72 @@ const Index = () => {
                 <Hand className="h-4 w-4 mr-3" />
                 Hand Signs
               </Button>
+
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start"
+                onClick={() => {
+                  setAppState(prev => ({ ...prev, activeTab: 'special-transport' }));
+                  setIsMenuOpen(false);
+                }}
+              >
+                <Calendar className="h-4 w-4 mr-3" />
+                Special Transport
+              </Button>
+
+              {appState.userType === 'driver' && (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start"
+                    onClick={() => {
+                      setAppState(prev => ({ ...prev, activeTab: 'driver-jobs' }));
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <Briefcase className="h-4 w-4 mr-3" />
+                    Job Opportunities
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start"
+                    onClick={() => {
+                      setAppState(prev => ({ ...prev, activeTab: 'financial-tracking' }));
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <TrendingUp className="h-4 w-4 mr-3" />
+                    Earnings Tracker
+                  </Button>
+                </>
+              )}
+
+              {appState.userType === 'owner' && (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start"
+                    onClick={() => {
+                      setAppState(prev => ({ ...prev, activeTab: 'taxi-management' }));
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <Car className="h-4 w-4 mr-3" />
+                    Fleet Management
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start"
+                    onClick={() => {
+                      setAppState(prev => ({ ...prev, activeTab: 'financial-tracking' }));
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <TrendingUp className="h-4 w-4 mr-3" />
+                    Financial Reports
+                  </Button>
+                </>
+              )}
             </div>
 
             <div className="pt-6 border-t">
